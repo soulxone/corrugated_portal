@@ -1,0 +1,477 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Customer Portal - Home{% endblock %}
+
+{% block page_content %}
+<style>
+:root {
+    --portal-primary: #1a6bb0;
+    --portal-primary-dark: #145a94;
+    --portal-primary-light: #e8f1fa;
+    --portal-success: #22c55e;
+    --portal-warning: #eab308;
+    --portal-danger: #ef4444;
+    --portal-gray-50: #f9fafb;
+    --portal-gray-100: #f3f4f6;
+    --portal-gray-200: #e5e7eb;
+    --portal-gray-300: #d1d5db;
+    --portal-gray-500: #6b7280;
+    --portal-gray-700: #374151;
+    --portal-gray-900: #111827;
+    --portal-radius: 12px;
+    --portal-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    --portal-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+
+/* Navbar Styles */
+.portal-navbar {
+    background: var(--portal-primary);
+    color: #fff;
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.portal-navbar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+}
+.portal-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+.portal-brand:hover { color: #fff; text-decoration: none; }
+.portal-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.portal-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+.portal-nav-link:hover {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    text-decoration: none;
+}
+.portal-nav-link.active {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+}
+.portal-logout { margin-left: 8px; }
+.portal-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 6px;
+}
+
+@media (max-width: 900px) {
+    .portal-menu-toggle { display: block; }
+    .portal-nav-links {
+        display: none;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: var(--portal-primary);
+        flex-direction: column;
+        padding: 12px 16px;
+        gap: 4px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+    .portal-nav-links.open { display: flex; }
+    .portal-nav-link { width: 100%; padding: 12px 16px; }
+}
+
+/* Portal Layout */
+.portal-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+/* Welcome Banner */
+.portal-welcome {
+    background: linear-gradient(135deg, var(--portal-primary) 0%, var(--portal-primary-dark) 100%);
+    border-radius: var(--portal-radius);
+    padding: 40px;
+    color: #fff;
+    margin-bottom: 32px;
+}
+.portal-welcome h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    color: #fff;
+}
+.portal-welcome p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Quick Actions */
+.portal-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+.portal-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    background: #fff;
+    border: 2px solid var(--portal-gray-200);
+    border-radius: var(--portal-radius);
+    text-decoration: none;
+    color: var(--portal-gray-700);
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.portal-action-btn:hover {
+    border-color: var(--portal-primary);
+    color: var(--portal-primary);
+    text-decoration: none;
+    box-shadow: var(--portal-shadow);
+    transform: translateY(-1px);
+}
+.portal-action-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--portal-primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--portal-primary);
+    flex-shrink: 0;
+}
+
+/* Stats Row */
+.portal-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+.portal-stat-card {
+    background: #fff;
+    border-radius: var(--portal-radius);
+    padding: 24px;
+    box-shadow: var(--portal-shadow);
+    text-align: center;
+}
+.portal-stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--portal-primary);
+    line-height: 1;
+    margin-bottom: 6px;
+}
+.portal-stat-label {
+    font-size: 13px;
+    color: var(--portal-gray-500);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Section Headers */
+.portal-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+.portal-section-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--portal-gray-900);
+    margin: 0;
+}
+.portal-section-header a {
+    font-size: 14px;
+    color: var(--portal-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+.portal-section-header a:hover { text-decoration: underline; }
+
+/* Cards Grid */
+.portal-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    margin-bottom: 40px;
+}
+.portal-card {
+    background: #fff;
+    border-radius: var(--portal-radius);
+    padding: 24px;
+    box-shadow: var(--portal-shadow);
+    transition: box-shadow 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.portal-card:hover {
+    box-shadow: var(--portal-shadow-lg);
+    text-decoration: none;
+    color: inherit;
+}
+.portal-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.portal-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--portal-gray-900);
+}
+.portal-card-meta {
+    font-size: 13px;
+    color: var(--portal-gray-500);
+    margin-top: 8px;
+}
+
+/* Status Badges */
+.portal-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.portal-badge-green { background: #dcfce7; color: #16a34a; }
+.portal-badge-blue { background: #dbeafe; color: #2563eb; }
+.portal-badge-yellow { background: #fef9c3; color: #ca8a04; }
+.portal-badge-red { background: #fee2e2; color: #dc2626; }
+.portal-badge-gray { background: var(--portal-gray-100); color: var(--portal-gray-500); }
+.portal-badge-purple { background: #f3e8ff; color: #9333ea; }
+
+/* Empty State */
+.portal-empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--portal-gray-500);
+}
+.portal-empty svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    opacity: 0.4;
+}
+.portal-empty p { margin: 0; font-size: 15px; }
+
+/* No customer state */
+.portal-no-customer {
+    text-align: center;
+    padding: 80px 24px;
+}
+.portal-no-customer h2 {
+    font-size: 22px;
+    color: var(--portal-gray-700);
+    margin-bottom: 8px;
+}
+.portal-no-customer p {
+    color: var(--portal-gray-500);
+    font-size: 16px;
+}
+</style>
+
+{% include "corrugated_portal/templates/includes/portal_navbar.html" %}
+
+<div class="portal-container" id="portal-home">
+    <!-- Welcome -->
+    <div class="portal-welcome">
+        <h1 id="welcome-msg">Welcome back!</h1>
+        <p id="welcome-sub">Your packaging portal dashboard</p>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="portal-actions">
+        <a href="/portal/request-quote" class="portal-action-btn">
+            <div class="portal-action-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+            Request a Quote
+        </a>
+        <a href="/portal/orders" class="portal-action-btn">
+            <div class="portal-action-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            View Orders
+        </a>
+        <a href="/portal/track" class="portal-action-btn">
+            <div class="portal-action-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            Track Shipments
+        </a>
+        <a href="/portal/artwork" class="portal-action-btn">
+            <div class="portal-action-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            Upload Artwork
+        </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="portal-stats" id="portal-stats" style="display:none;">
+        <div class="portal-stat-card">
+            <div class="portal-stat-value" id="stat-orders">0</div>
+            <div class="portal-stat-label">Total Orders</div>
+        </div>
+        <div class="portal-stat-card">
+            <div class="portal-stat-value" id="stat-recent">0</div>
+            <div class="portal-stat-label">Recent Orders</div>
+        </div>
+        <div class="portal-stat-card">
+            <div class="portal-stat-value" id="stat-estimates">0</div>
+            <div class="portal-stat-label">Open Estimates</div>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="portal-section-header">
+        <h2>Recent Orders</h2>
+        <a href="/portal/orders">View All &rarr;</a>
+    </div>
+    <div class="portal-cards" id="recent-orders">
+        <div class="portal-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <p>Loading orders...</p>
+        </div>
+    </div>
+
+    <!-- Open Estimates -->
+    <div class="portal-section-header">
+        <h2>Open Estimates</h2>
+    </div>
+    <div class="portal-cards" id="open-estimates">
+        <div class="portal-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/></svg>
+            <p>Loading estimates...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    frappe.call({
+        method: "corrugated_portal.api.get_portal_home",
+        callback: function (r) {
+            if (!r.message || r.message.error) {
+                document.getElementById("portal-home").innerHTML =
+                    '<div class="portal-no-customer"><h2>Account Not Linked</h2><p>' +
+                    (r.message ? r.message.error : "Unable to load portal data.") +
+                    "</p></div>";
+                return;
+            }
+            var d = r.message;
+
+            // Welcome
+            document.getElementById("welcome-msg").textContent =
+                "Welcome back, " + (d.customer_name || d.customer) + "!";
+
+            // Stats
+            document.getElementById("portal-stats").style.display = "grid";
+            document.getElementById("stat-orders").textContent = d.total_orders || 0;
+            document.getElementById("stat-recent").textContent =
+                d.recent_orders ? d.recent_orders.length : 0;
+            document.getElementById("stat-estimates").textContent =
+                d.open_estimates ? d.open_estimates.length : 0;
+
+            // Recent Orders
+            var ordersHtml = "";
+            if (d.recent_orders && d.recent_orders.length) {
+                d.recent_orders.forEach(function (o) {
+                    var badge = get_status_badge(o.status);
+                    ordersHtml +=
+                        '<a href="/portal/orders?order=' + o.name + '" class="portal-card">' +
+                        '<div class="portal-card-header">' +
+                        '<span class="portal-card-title">' + o.name + "</span>" +
+                        '<span class="portal-badge ' + badge + '">' + o.status + "</span>" +
+                        "</div>" +
+                        '<div class="portal-card-meta">Date: ' + o.transaction_date +
+                        " &bull; Total: $" + (o.grand_total || 0).toLocaleString() +
+                        "</div></a>";
+                });
+            } else {
+                ordersHtml =
+                    '<div class="portal-empty"><p>No recent orders found.</p></div>';
+            }
+            document.getElementById("recent-orders").innerHTML = ordersHtml;
+
+            // Open Estimates
+            var estHtml = "";
+            if (d.open_estimates && d.open_estimates.length) {
+                d.open_estimates.forEach(function (e) {
+                    var badge =
+                        e.status === "Draft" ? "portal-badge-yellow" : "portal-badge-blue";
+                    estHtml +=
+                        '<div class="portal-card">' +
+                        '<div class="portal-card-header">' +
+                        '<span class="portal-card-title">' + e.name + "</span>" +
+                        '<span class="portal-badge ' + badge + '">' + e.status + "</span>" +
+                        "</div>" +
+                        '<div class="portal-card-meta">Style: ' + (e.box_style || "-") +
+                        " &bull; Date: " + e.estimate_date +
+                        "</div></div>";
+                });
+            } else {
+                estHtml =
+                    '<div class="portal-empty"><p>No open estimates.</p></div>';
+            }
+            document.getElementById("open-estimates").innerHTML = estHtml;
+        },
+    });
+
+    function get_status_badge(status) {
+        var map = {
+            Completed: "portal-badge-green",
+            Closed: "portal-badge-green",
+            "To Deliver and Bill": "portal-badge-blue",
+            "To Bill": "portal-badge-blue",
+            "To Deliver": "portal-badge-yellow",
+            Draft: "portal-badge-yellow",
+            Overdue: "portal-badge-red",
+            Cancelled: "portal-badge-red",
+        };
+        return map[status] || "portal-badge-gray";
+    }
+});
+</script>
+{% endblock %}

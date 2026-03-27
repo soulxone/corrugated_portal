@@ -1,0 +1,317 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Artwork - Customer Portal{% endblock %}
+
+{% block page_content %}
+<style>
+:root {
+    --portal-primary: #1a6bb0;
+    --portal-primary-dark: #145a94;
+    --portal-primary-light: #e8f1fa;
+    --portal-gray-50: #f9fafb;
+    --portal-gray-100: #f3f4f6;
+    --portal-gray-200: #e5e7eb;
+    --portal-gray-300: #d1d5db;
+    --portal-gray-500: #6b7280;
+    --portal-gray-700: #374151;
+    --portal-gray-900: #111827;
+    --portal-radius: 12px;
+    --portal-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    --portal-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+.portal-navbar{background:var(--portal-primary);color:#fff;padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}.portal-navbar-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}.portal-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-size:18px;font-weight:700}.portal-brand:hover{color:#fff;text-decoration:none}.portal-nav-links{display:flex;align-items:center;gap:4px}.portal-nav-link{display:flex;align-items:center;gap:6px;padding:8px 14px;color:rgba(255,255,255,.85);text-decoration:none;border-radius:8px;font-size:14px;font-weight:500;transition:all .15s ease}.portal-nav-link:hover{background:rgba(255,255,255,.15);color:#fff;text-decoration:none}.portal-nav-link.active{background:rgba(255,255,255,.2);color:#fff}.portal-logout{margin-left:8px}.portal-menu-toggle{display:none;background:0 0;border:none;color:#fff;cursor:pointer;padding:6px}@media(max-width:900px){.portal-menu-toggle{display:block}.portal-nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--portal-primary);flex-direction:column;padding:12px 16px;gap:4px;box-shadow:0 8px 16px rgba(0,0,0,.2)}.portal-nav-links.open{display:flex}.portal-nav-link{width:100%;padding:12px 16px}}
+.portal-badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.portal-badge-green{background:#dcfce7;color:#16a34a}.portal-badge-blue{background:#dbeafe;color:#2563eb}.portal-badge-yellow{background:#fef9c3;color:#ca8a04}.portal-badge-red{background:#fee2e2;color:#dc2626}.portal-badge-gray{background:var(--portal-gray-100);color:var(--portal-gray-500)}
+
+.portal-container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+.portal-page-title { font-size: 24px; font-weight: 700; color: var(--portal-gray-900); margin: 0 0 8px; }
+.portal-page-subtitle { font-size: 15px; color: var(--portal-gray-500); margin: 0 0 32px; }
+.portal-empty { text-align: center; padding: 48px 24px; color: var(--portal-gray-500); }
+
+.portal-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    border: none; cursor: pointer; transition: all 0.15s;
+}
+.portal-btn-primary { background: var(--portal-primary); color: #fff; }
+.portal-btn-primary:hover { background: var(--portal-primary-dark); }
+.portal-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Upload area */
+.upload-section {
+    background: #fff;
+    border-radius: var(--portal-radius);
+    box-shadow: var(--portal-shadow);
+    padding: 32px;
+    margin-bottom: 32px;
+}
+.upload-section h2 { font-size: 18px; font-weight: 700; margin: 0 0 20px; color: var(--portal-gray-900); }
+
+.dropzone {
+    border: 2px dashed var(--portal-gray-300);
+    border-radius: var(--portal-radius);
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 20px;
+}
+.dropzone:hover, .dropzone.dragover {
+    border-color: var(--portal-primary);
+    background: var(--portal-primary-light);
+}
+.dropzone svg { width: 48px; height: 48px; color: var(--portal-gray-400); margin-bottom: 12px; }
+.dropzone p { margin: 0; font-size: 15px; color: var(--portal-gray-500); }
+.dropzone .browse-link { color: var(--portal-primary); font-weight: 600; cursor: pointer; }
+.dropzone .file-selected { font-weight: 600; color: var(--portal-primary); margin-top: 8px; }
+
+.upload-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.form-group { display: flex; flex-direction: column; }
+.form-label { font-size: 13px; font-weight: 600; color: var(--portal-gray-700); margin-bottom: 6px; }
+.form-label .required { color: #ef4444; }
+.form-input, .form-select {
+    padding: 10px 14px; border: 2px solid var(--portal-gray-200); border-radius: 8px;
+    font-size: 14px; outline: none; transition: border-color 0.2s; background: #fff; width: 100%; box-sizing: border-box;
+}
+.form-input:focus, .form-select:focus { border-color: var(--portal-primary); }
+
+/* Past uploads grid */
+.uploads-list h2 { font-size: 20px; font-weight: 700; color: var(--portal-gray-900); margin: 0 0 16px; }
+.uploads-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+}
+.upload-card {
+    background: #fff;
+    border-radius: var(--portal-radius);
+    padding: 20px;
+    box-shadow: var(--portal-shadow);
+}
+.upload-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.upload-card-name { font-size: 16px; font-weight: 600; color: var(--portal-gray-900); }
+.upload-card-meta { font-size: 13px; color: var(--portal-gray-500); margin-top: 4px; }
+.upload-card-notes {
+    margin-top: 12px;
+    padding: 12px;
+    background: #fef2f2;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #b91c1c;
+}
+</style>
+
+{% include "corrugated_portal/templates/includes/portal_navbar.html" %}
+
+<div class="portal-container">
+    <h1 class="portal-page-title">Artwork</h1>
+    <p class="portal-page-subtitle">Upload and manage your artwork files for production.</p>
+
+    <!-- Upload Section -->
+    <div class="upload-section">
+        <h2>Upload New Artwork</h2>
+
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <p>Drag and drop your file here, or <span class="browse-link">browse</span></p>
+            <p style="font-size:12px;margin-top:8px;color:var(--portal-gray-400)">Supported: AI, PDF, EPS, PSD (max 25MB)</p>
+            <div class="file-selected" id="file-name" style="display:none;"></div>
+            <input type="file" id="file-input" accept=".ai,.pdf,.eps,.psd,.png,.jpg,.jpeg,.tiff,.svg" style="display:none">
+        </div>
+
+        <div class="upload-fields">
+            <div class="form-group">
+                <label class="form-label">Artwork Name <span class="required">*</span></label>
+                <input type="text" class="form-input" id="art-name" placeholder="e.g. Product Box Front Design v2" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">File Type</label>
+                <select class="form-select" id="art-type">
+                    <option value="AI">Adobe Illustrator (AI)</option>
+                    <option value="PDF">PDF</option>
+                    <option value="EPS">EPS</option>
+                    <option value="PSD">Photoshop (PSD)</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="text-align:right;">
+            <button class="portal-btn portal-btn-primary" id="upload-btn" onclick="uploadArtwork()" disabled>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Upload Artwork
+            </button>
+        </div>
+    </div>
+
+    <!-- Past Uploads -->
+    <div class="uploads-list">
+        <h2>Your Artwork Files</h2>
+        <div class="uploads-grid" id="uploads-grid">
+            <div class="portal-empty">Loading artwork files...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+var selectedFile = null;
+
+document.addEventListener("DOMContentLoaded", function () {
+    loadUploads();
+
+    // File input
+    document.getElementById("file-input").addEventListener("change", function (e) {
+        if (e.target.files.length) {
+            selectedFile = e.target.files[0];
+            document.getElementById("file-name").textContent = selectedFile.name;
+            document.getElementById("file-name").style.display = "block";
+            document.getElementById("upload-btn").disabled = false;
+
+            // Auto-detect type
+            var ext = selectedFile.name.split(".").pop().toUpperCase();
+            var typeMap = { AI: "AI", PDF: "PDF", EPS: "EPS", PSD: "PSD" };
+            if (typeMap[ext]) {
+                document.getElementById("art-type").value = typeMap[ext];
+            }
+        }
+    });
+
+    // Drag and drop
+    var dz = document.getElementById("dropzone");
+    dz.addEventListener("dragover", function (e) { e.preventDefault(); dz.classList.add("dragover"); });
+    dz.addEventListener("dragleave", function () { dz.classList.remove("dragover"); });
+    dz.addEventListener("drop", function (e) {
+        e.preventDefault();
+        dz.classList.remove("dragover");
+        if (e.dataTransfer.files.length) {
+            selectedFile = e.dataTransfer.files[0];
+            document.getElementById("file-input").files = e.dataTransfer.files;
+            document.getElementById("file-name").textContent = selectedFile.name;
+            document.getElementById("file-name").style.display = "block";
+            document.getElementById("upload-btn").disabled = false;
+        }
+    });
+});
+
+function uploadArtwork() {
+    var artName = document.getElementById("art-name").value;
+    if (!artName) {
+        frappe.msgprint("Please enter an artwork name.");
+        return;
+    }
+    if (!selectedFile) {
+        frappe.msgprint("Please select a file to upload.");
+        return;
+    }
+
+    var btn = document.getElementById("upload-btn");
+    btn.disabled = true;
+    btn.textContent = "Uploading...";
+
+    // First upload the file to Frappe
+    var formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("is_private", 0);
+    formData.append("doctype", "Artwork Upload");
+
+    fetch("/api/method/upload_file", {
+        method: "POST",
+        headers: {
+            "X-Frappe-CSRF-Token": frappe.csrf_token,
+        },
+        body: formData,
+    })
+    .then(function (resp) { return resp.json(); })
+    .then(function (data) {
+        if (data.message && data.message.file_url) {
+            // Now create the artwork record
+            frappe.call({
+                method: "corrugated_portal.api.upload_artwork",
+                args: {
+                    artwork_name: artName,
+                    file_url: data.message.file_url,
+                    file_type: document.getElementById("art-type").value,
+                },
+                callback: function (r) {
+                    if (r.message && r.message.status === "success") {
+                        frappe.msgprint("Artwork uploaded successfully!");
+                        // Reset form
+                        selectedFile = null;
+                        document.getElementById("art-name").value = "";
+                        document.getElementById("file-input").value = "";
+                        document.getElementById("file-name").style.display = "none";
+                        btn.disabled = true;
+                        btn.textContent = "Upload Artwork";
+                        loadUploads();
+                    } else {
+                        frappe.msgprint("Error creating artwork record.");
+                        btn.disabled = false;
+                        btn.textContent = "Upload Artwork";
+                    }
+                }
+            });
+        } else {
+            frappe.msgprint("Error uploading file.");
+            btn.disabled = false;
+            btn.textContent = "Upload Artwork";
+        }
+    })
+    .catch(function () {
+        frappe.msgprint("Error uploading file. Please try again.");
+        btn.disabled = false;
+        btn.textContent = "Upload Artwork";
+    });
+}
+
+function loadUploads() {
+    frappe.call({
+        method: "corrugated_portal.api.get_artwork_uploads",
+        callback: function (r) {
+            var uploads = r.message || [];
+            var grid = document.getElementById("uploads-grid");
+
+            if (!uploads.length) {
+                grid.innerHTML = '<div class="portal-empty"><p>No artwork files uploaded yet.</p></div>';
+                return;
+            }
+
+            var html = "";
+            uploads.forEach(function (u) {
+                var badgeClass = {
+                    "Pending Review": "portal-badge-yellow",
+                    Approved: "portal-badge-green",
+                    "Revision Needed": "portal-badge-red",
+                    Archived: "portal-badge-gray",
+                };
+                html += '<div class="upload-card">' +
+                    '<div class="upload-card-header">' +
+                    '<div><div class="upload-card-name">' + u.artwork_name + '</div>' +
+                    '<div class="upload-card-meta">' + u.name + ' &bull; Rev ' + u.revision_number + ' &bull; ' + (u.file_type || "File") + '</div></div>' +
+                    '<span class="portal-badge ' + (badgeClass[u.status] || "portal-badge-gray") + '">' + u.status + '</span>' +
+                    '</div>' +
+                    '<div class="upload-card-meta">Uploaded: ' + u.uploaded_date + '</div>';
+
+                if (u.status === "Revision Needed" && u.review_notes) {
+                    html += '<div class="upload-card-notes"><strong>Revision Notes:</strong> ' + u.review_notes + '</div>';
+                }
+                html += '</div>';
+            });
+            grid.innerHTML = html;
+        }
+    });
+}
+</script>
+{% endblock %}

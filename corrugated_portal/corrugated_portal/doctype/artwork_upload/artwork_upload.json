@@ -1,0 +1,125 @@
+{
+    "name": "Artwork Upload",
+    "doctype": "DocType",
+    "module": "Corrugated Portal",
+    "autoname": "ART-.YYYY.-.#####",
+    "editable_grid": 1,
+    "engine": "InnoDB",
+    "fields": [
+        {
+            "fieldname": "artwork_name",
+            "fieldtype": "Data",
+            "label": "Artwork Name",
+            "reqd": 1,
+            "in_list_view": 1
+        },
+        {
+            "fieldname": "customer",
+            "fieldtype": "Link",
+            "label": "Customer",
+            "options": "Customer",
+            "in_list_view": 1
+        },
+        {
+            "fieldname": "column_break_1",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "sales_order",
+            "fieldtype": "Link",
+            "label": "Sales Order",
+            "options": "Sales Order"
+        },
+        {
+            "fieldname": "corrugated_estimate",
+            "fieldtype": "Link",
+            "label": "Corrugated Estimate",
+            "options": "Corrugated Estimate"
+        },
+        {
+            "fieldname": "status",
+            "fieldtype": "Select",
+            "label": "Status",
+            "options": "Pending Review\nApproved\nRevision Needed\nArchived",
+            "default": "Pending Review",
+            "in_list_view": 1
+        },
+        {
+            "fieldname": "section_file",
+            "fieldtype": "Section Break",
+            "label": "File"
+        },
+        {
+            "fieldname": "file",
+            "fieldtype": "Attach",
+            "label": "Artwork File",
+            "reqd": 1
+        },
+        {
+            "fieldname": "file_type",
+            "fieldtype": "Select",
+            "label": "File Type",
+            "options": "AI\nPDF\nEPS\nPSD\nOther"
+        },
+        {
+            "fieldname": "column_break_2",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "uploaded_by",
+            "fieldtype": "Data",
+            "label": "Uploaded By"
+        },
+        {
+            "fieldname": "uploaded_date",
+            "fieldtype": "Date",
+            "label": "Uploaded Date",
+            "default": "Today"
+        },
+        {
+            "fieldname": "revision_number",
+            "fieldtype": "Int",
+            "label": "Revision Number",
+            "default": "1"
+        },
+        {
+            "fieldname": "section_review",
+            "fieldtype": "Section Break",
+            "label": "Review"
+        },
+        {
+            "fieldname": "reviewer",
+            "fieldtype": "Link",
+            "label": "Reviewer",
+            "options": "User"
+        },
+        {
+            "fieldname": "review_date",
+            "fieldtype": "Date",
+            "label": "Review Date"
+        },
+        {
+            "fieldname": "review_notes",
+            "fieldtype": "Text",
+            "label": "Review Notes"
+        }
+    ],
+    "permissions": [
+        {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1,
+            "delete": 1
+        },
+        {
+            "role": "Sales User",
+            "read": 1,
+            "write": 1,
+            "create": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "title_field": "artwork_name"
+}

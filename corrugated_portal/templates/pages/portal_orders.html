@@ -1,0 +1,417 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Orders - Customer Portal{% endblock %}
+
+{% block page_content %}
+<style>
+:root {
+    --portal-primary: #1a6bb0;
+    --portal-primary-dark: #145a94;
+    --portal-primary-light: #e8f1fa;
+    --portal-success: #22c55e;
+    --portal-warning: #eab308;
+    --portal-danger: #ef4444;
+    --portal-gray-50: #f9fafb;
+    --portal-gray-100: #f3f4f6;
+    --portal-gray-200: #e5e7eb;
+    --portal-gray-300: #d1d5db;
+    --portal-gray-500: #6b7280;
+    --portal-gray-700: #374151;
+    --portal-gray-900: #111827;
+    --portal-radius: 12px;
+    --portal-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    --portal-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+.portal-navbar{background:var(--portal-primary);color:#fff;padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}.portal-navbar-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}.portal-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-size:18px;font-weight:700}.portal-brand:hover{color:#fff;text-decoration:none}.portal-nav-links{display:flex;align-items:center;gap:4px}.portal-nav-link{display:flex;align-items:center;gap:6px;padding:8px 14px;color:rgba(255,255,255,.85);text-decoration:none;border-radius:8px;font-size:14px;font-weight:500;transition:all .15s ease}.portal-nav-link:hover{background:rgba(255,255,255,.15);color:#fff;text-decoration:none}.portal-nav-link.active{background:rgba(255,255,255,.2);color:#fff}.portal-logout{margin-left:8px}.portal-menu-toggle{display:none;background:0 0;border:none;color:#fff;cursor:pointer;padding:6px}@media(max-width:900px){.portal-menu-toggle{display:block}.portal-nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--portal-primary);flex-direction:column;padding:12px 16px;gap:4px;box-shadow:0 8px 16px rgba(0,0,0,.2)}.portal-nav-links.open{display:flex}.portal-nav-link{width:100%;padding:12px 16px}}
+.portal-badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.portal-badge-green{background:#dcfce7;color:#16a34a}.portal-badge-blue{background:#dbeafe;color:#2563eb}.portal-badge-yellow{background:#fef9c3;color:#ca8a04}.portal-badge-red{background:#fee2e2;color:#dc2626}.portal-badge-gray{background:var(--portal-gray-100);color:var(--portal-gray-500)}
+
+.portal-container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+.portal-page-title { font-size: 24px; font-weight: 700; color: var(--portal-gray-900); margin: 0 0 24px; }
+
+/* Filter Bar */
+.portal-filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.portal-search-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 16px;
+    border: 2px solid var(--portal-gray-200);
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.portal-search-input:focus { border-color: var(--portal-primary); }
+.portal-select {
+    padding: 10px 16px;
+    border: 2px solid var(--portal-gray-200);
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    background: #fff;
+    cursor: pointer;
+    min-width: 160px;
+}
+.portal-select:focus { border-color: var(--portal-primary); }
+
+/* Orders Table */
+.portal-table-wrap {
+    background: #fff;
+    border-radius: var(--portal-radius);
+    box-shadow: var(--portal-shadow);
+    overflow: hidden;
+}
+.portal-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.portal-table th {
+    background: var(--portal-gray-50);
+    padding: 14px 20px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--portal-gray-500);
+    border-bottom: 2px solid var(--portal-gray-200);
+}
+.portal-table td {
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--portal-gray-700);
+    border-bottom: 1px solid var(--portal-gray-100);
+}
+.portal-table tr:hover { background: var(--portal-gray-50); cursor: pointer; }
+.portal-table tr:last-child td { border-bottom: none; }
+.portal-order-link {
+    color: var(--portal-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+.portal-order-link:hover { text-decoration: underline; }
+
+/* Pagination */
+.portal-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+}
+.portal-page-btn {
+    padding: 8px 16px;
+    border: 2px solid var(--portal-gray-200);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--portal-gray-700);
+    transition: all 0.2s;
+}
+.portal-page-btn:hover { border-color: var(--portal-primary); color: var(--portal-primary); }
+.portal-page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Order Detail Modal */
+.portal-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 16px;
+    overflow-y: auto;
+}
+.portal-modal-overlay.open { display: flex; }
+.portal-modal {
+    background: #fff;
+    border-radius: var(--portal-radius);
+    width: 100%;
+    max-width: 800px;
+    box-shadow: var(--portal-shadow-lg);
+    animation: portalSlideUp 0.25s ease;
+}
+@keyframes portalSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.portal-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px;
+    border-bottom: 1px solid var(--portal-gray-200);
+}
+.portal-modal-header h2 { margin: 0; font-size: 20px; }
+.portal-modal-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: var(--portal-gray-100);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.portal-modal-body { padding: 24px; }
+.portal-detail-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+.portal-detail-item { flex: 1; min-width: 140px; }
+.portal-detail-label { font-size: 12px; color: var(--portal-gray-500); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+.portal-detail-value { font-size: 16px; color: var(--portal-gray-900); font-weight: 600; margin-top: 4px; }
+
+.portal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.portal-btn-primary { background: var(--portal-primary); color: #fff; }
+.portal-btn-primary:hover { background: var(--portal-primary-dark); }
+
+.portal-empty { text-align: center; padding: 48px 24px; color: var(--portal-gray-500); }
+
+@media (max-width: 640px) {
+    .portal-table th:nth-child(4), .portal-table td:nth-child(4),
+    .portal-table th:nth-child(5), .portal-table td:nth-child(5) { display: none; }
+}
+</style>
+
+{% include "corrugated_portal/templates/includes/portal_navbar.html" %}
+
+<div class="portal-container">
+    <h1 class="portal-page-title">Your Orders</h1>
+
+    <div class="portal-filter-bar">
+        <input type="text" class="portal-search-input" id="order-search" placeholder="Search orders...">
+        <select class="portal-select" id="status-filter">
+            <option value="All">All Statuses</option>
+            <option value="To Deliver and Bill">To Deliver and Bill</option>
+            <option value="To Bill">To Bill</option>
+            <option value="To Deliver">To Deliver</option>
+            <option value="Completed">Completed</option>
+            <option value="Closed">Closed</option>
+        </select>
+    </div>
+
+    <div class="portal-table-wrap">
+        <table class="portal-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="orders-tbody">
+                <tr><td colspan="5" class="portal-empty">Loading orders...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="portal-pagination" id="orders-pagination"></div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="portal-modal-overlay" id="order-modal">
+    <div class="portal-modal">
+        <div class="portal-modal-header">
+            <h2 id="modal-title">Order Detail</h2>
+            <button class="portal-modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="portal-modal-body" id="modal-body">
+            Loading...
+        </div>
+    </div>
+</div>
+
+<script>
+var currentPage = 0;
+var debounceTimer;
+
+document.addEventListener("DOMContentLoaded", function () {
+    loadOrders();
+
+    document.getElementById("status-filter").addEventListener("change", function () {
+        currentPage = 0;
+        loadOrders();
+    });
+
+    document.getElementById("order-search").addEventListener("input", function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function () {
+            currentPage = 0;
+            loadOrders();
+        }, 400);
+    });
+
+    // Check URL for order detail
+    var params = new URLSearchParams(window.location.search);
+    if (params.get("order")) {
+        showOrderDetail(params.get("order"));
+    }
+
+    // Close modal on overlay click
+    document.getElementById("order-modal").addEventListener("click", function (e) {
+        if (e.target === this) closeModal();
+    });
+});
+
+function loadOrders() {
+    var status = document.getElementById("status-filter").value;
+    var search = document.getElementById("order-search").value;
+
+    frappe.call({
+        method: "corrugated_portal.api.get_customer_orders",
+        args: { status_filter: status, search: search, page: currentPage },
+        callback: function (r) {
+            var orders = r.message || [];
+            var tbody = document.getElementById("orders-tbody");
+
+            if (!orders.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="portal-empty">No orders found.</td></tr>';
+                document.getElementById("orders-pagination").innerHTML = "";
+                return;
+            }
+
+            var html = "";
+            orders.forEach(function (o) {
+                var badge = getStatusBadge(o.status);
+                html += '<tr onclick="showOrderDetail(\'' + o.name + '\')">' +
+                    '<td><span class="portal-order-link">' + o.name + '</span></td>' +
+                    '<td>' + o.transaction_date + '</td>' +
+                    '<td><span class="portal-badge ' + badge + '">' + o.status + '</span></td>' +
+                    '<td>' + (o.total_qty || 0) + '</td>' +
+                    '<td>$' + (o.grand_total || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + '</td>' +
+                    '</tr>';
+            });
+            tbody.innerHTML = html;
+
+            // Pagination
+            var pagHtml = '';
+            if (currentPage > 0) {
+                pagHtml += '<button class="portal-page-btn" onclick="changePage(-1)">&laquo; Previous</button>';
+            }
+            if (orders.length === 20) {
+                pagHtml += '<button class="portal-page-btn" onclick="changePage(1)">Next &raquo;</button>';
+            }
+            document.getElementById("orders-pagination").innerHTML = pagHtml;
+        }
+    });
+}
+
+function changePage(dir) {
+    currentPage += dir;
+    if (currentPage < 0) currentPage = 0;
+    loadOrders();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function showOrderDetail(name) {
+    document.getElementById("order-modal").classList.add("open");
+    document.getElementById("modal-title").textContent = name;
+    document.getElementById("modal-body").innerHTML = "Loading...";
+
+    frappe.call({
+        method: "corrugated_portal.api.get_order_detail",
+        args: { order_name: name },
+        callback: function (r) {
+            var d = r.message;
+            if (!d) {
+                document.getElementById("modal-body").innerHTML = "<p>Unable to load order detail.</p>";
+                return;
+            }
+
+            var badge = getStatusBadge(d.status);
+            var html = '<div class="portal-detail-row">' +
+                '<div class="portal-detail-item"><div class="portal-detail-label">Date</div><div class="portal-detail-value">' + d.date + '</div></div>' +
+                '<div class="portal-detail-item"><div class="portal-detail-label">Status</div><div class="portal-detail-value"><span class="portal-badge ' + badge + '">' + d.status + '</span></div></div>' +
+                '<div class="portal-detail-item"><div class="portal-detail-label">Total</div><div class="portal-detail-value">$' + (d.grand_total || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + '</div></div>' +
+                '</div>';
+
+            // Items
+            html += '<h3 style="margin:24px 0 12px;font-size:16px;">Items</h3>' +
+                '<table class="portal-table" style="margin-bottom:24px"><thead><tr>' +
+                '<th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>';
+            (d.items || []).forEach(function (item) {
+                html += '<tr><td>' + (item.item_name || item.item_code) + '</td>' +
+                    '<td>' + item.qty + '</td>' +
+                    '<td>$' + (item.rate || 0).toFixed(2) + '</td>' +
+                    '<td>$' + (item.amount || 0).toFixed(2) + '</td></tr>';
+            });
+            html += '</tbody></table>';
+
+            // Shipments
+            if (d.shipments && d.shipments.length) {
+                html += '<h3 style="margin:24px 0 12px;font-size:16px;">Shipments</h3>';
+                d.shipments.forEach(function (s) {
+                    html += '<div style="padding:12px 16px;background:var(--portal-gray-50);border-radius:8px;margin-bottom:8px;">' +
+                        '<strong>' + s.name + '</strong> &bull; ' + s.posting_date +
+                        ' <span class="portal-badge portal-badge-blue">' + s.status + '</span></div>';
+                });
+            }
+
+            // Reorder button
+            html += '<div style="margin-top:24px;text-align:right;">' +
+                '<button class="portal-btn portal-btn-primary" onclick="reorderFrom(\'' + d.name + '\')">Reorder</button></div>';
+
+            document.getElementById("modal-body").innerHTML = html;
+        }
+    });
+}
+
+function closeModal() {
+    document.getElementById("order-modal").classList.remove("open");
+    // Clean URL
+    if (window.history.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}
+
+function reorderFrom(name) {
+    frappe.call({
+        method: "corrugated_portal.api.reorder",
+        args: { sales_order_name: name },
+        callback: function (r) {
+            var d = r.message;
+            if (d && d.status === "success") {
+                frappe.msgprint("Reorder estimate " + d.estimate + " created successfully!");
+                closeModal();
+            } else {
+                frappe.msgprint(d ? d.message : "Unable to reorder.");
+            }
+        }
+    });
+}
+
+function getStatusBadge(status) {
+    var map = {
+        Completed: "portal-badge-green", Closed: "portal-badge-green",
+        "To Deliver and Bill": "portal-badge-blue", "To Bill": "portal-badge-blue",
+        "To Deliver": "portal-badge-yellow", Draft: "portal-badge-yellow",
+        Overdue: "portal-badge-red", Cancelled: "portal-badge-red"
+    };
+    return map[status] || "portal-badge-gray";
+}
+</script>
+{% endblock %}

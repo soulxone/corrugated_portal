@@ -1,0 +1,70 @@
+{
+    "name": "Portal Settings",
+    "doctype": "DocType",
+    "module": "Corrugated Portal",
+    "issingle": 1,
+    "editable_grid": 1,
+    "engine": "InnoDB",
+    "fields": [
+        {
+            "fieldname": "company_name",
+            "fieldtype": "Data",
+            "label": "Company Name",
+            "default": "Welchwyse"
+        },
+        {
+            "fieldname": "company_logo",
+            "fieldtype": "Attach Image",
+            "label": "Company Logo"
+        },
+        {
+            "fieldname": "primary_color",
+            "fieldtype": "Data",
+            "label": "Primary Color",
+            "default": "#1a6bb0"
+        },
+        {
+            "fieldname": "welcome_message",
+            "fieldtype": "Text",
+            "label": "Welcome Message",
+            "default": "Welcome to your packaging portal"
+        },
+        {
+            "fieldname": "section_contact",
+            "fieldtype": "Section Break",
+            "label": "Contact Information"
+        },
+        {
+            "fieldname": "contact_email",
+            "fieldtype": "Data",
+            "label": "Contact Email",
+            "options": "Email"
+        },
+        {
+            "fieldname": "contact_phone",
+            "fieldtype": "Data",
+            "label": "Contact Phone",
+            "options": "Phone"
+        },
+        {
+            "fieldname": "section_terms",
+            "fieldtype": "Section Break",
+            "label": "Terms"
+        },
+        {
+            "fieldname": "terms_text",
+            "fieldtype": "Text Editor",
+            "label": "Terms & Conditions"
+        }
+    ],
+    "permissions": [
+        {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC"
+}

@@ -1,0 +1,369 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Request a Quote - Customer Portal{% endblock %}
+
+{% block page_content %}
+<style>
+:root {
+    --portal-primary: #1a6bb0;
+    --portal-primary-dark: #145a94;
+    --portal-primary-light: #e8f1fa;
+    --portal-gray-50: #f9fafb;
+    --portal-gray-100: #f3f4f6;
+    --portal-gray-200: #e5e7eb;
+    --portal-gray-300: #d1d5db;
+    --portal-gray-500: #6b7280;
+    --portal-gray-700: #374151;
+    --portal-gray-900: #111827;
+    --portal-radius: 12px;
+    --portal-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    --portal-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+.portal-navbar{background:var(--portal-primary);color:#fff;padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}.portal-navbar-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}.portal-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-size:18px;font-weight:700}.portal-brand:hover{color:#fff;text-decoration:none}.portal-nav-links{display:flex;align-items:center;gap:4px}.portal-nav-link{display:flex;align-items:center;gap:6px;padding:8px 14px;color:rgba(255,255,255,.85);text-decoration:none;border-radius:8px;font-size:14px;font-weight:500;transition:all .15s ease}.portal-nav-link:hover{background:rgba(255,255,255,.15);color:#fff;text-decoration:none}.portal-nav-link.active{background:rgba(255,255,255,.2);color:#fff}.portal-logout{margin-left:8px}.portal-menu-toggle{display:none;background:0 0;border:none;color:#fff;cursor:pointer;padding:6px}@media(max-width:900px){.portal-menu-toggle{display:block}.portal-nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--portal-primary);flex-direction:column;padding:12px 16px;gap:4px;box-shadow:0 8px 16px rgba(0,0,0,.2)}.portal-nav-links.open{display:flex}.portal-nav-link{width:100%;padding:12px 16px}}
+
+.portal-container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+.portal-page-title { font-size: 24px; font-weight: 700; color: var(--portal-gray-900); margin: 0 0 8px; }
+.portal-page-subtitle { font-size: 15px; color: var(--portal-gray-500); margin: 0 0 32px; }
+
+/* Form */
+.quote-form {
+    background: #fff;
+    border-radius: var(--portal-radius);
+    box-shadow: var(--portal-shadow);
+    padding: 32px;
+    max-width: 800px;
+}
+.form-section {
+    margin-bottom: 28px;
+}
+.form-section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--portal-gray-900);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--portal-gray-100);
+}
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+.form-group.full-width { grid-column: 1 / -1; }
+.form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--portal-gray-700);
+    margin-bottom: 6px;
+}
+.form-label .required { color: #ef4444; margin-left: 2px; }
+.form-input, .form-select, .form-textarea {
+    padding: 10px 14px;
+    border: 2px solid var(--portal-gray-200);
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #fff;
+    width: 100%;
+    box-sizing: border-box;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--portal-primary);
+}
+.form-textarea { resize: vertical; min-height: 100px; }
+.form-select { cursor: pointer; }
+
+/* Dimension inputs with unit label */
+.dim-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.dim-group .form-input { flex: 1; }
+.dim-unit { font-size: 13px; color: var(--portal-gray-500); font-weight: 500; white-space: nowrap; }
+
+/* Urgency selector */
+.urgency-options {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.urgency-option {
+    flex: 1;
+    min-width: 120px;
+}
+.urgency-option input[type="radio"] { display: none; }
+.urgency-option label {
+    display: block;
+    padding: 12px 16px;
+    border: 2px solid var(--portal-gray-200);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+.urgency-option input:checked + label {
+    border-color: var(--portal-primary);
+    background: var(--portal-primary-light);
+    color: var(--portal-primary);
+}
+.urgency-option label:hover {
+    border-color: var(--portal-primary);
+}
+
+/* Submit */
+.portal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.portal-btn-primary { background: var(--portal-primary); color: #fff; }
+.portal-btn-primary:hover { background: var(--portal-primary-dark); }
+.portal-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 16px;
+    border-top: 2px solid var(--portal-gray-100);
+    margin-top: 8px;
+}
+
+/* Success message */
+.quote-success {
+    display: none;
+    text-align: center;
+    padding: 48px 24px;
+    background: #fff;
+    border-radius: var(--portal-radius);
+    box-shadow: var(--portal-shadow);
+    max-width: 500px;
+    margin: 0 auto;
+}
+.quote-success svg { width: 64px; height: 64px; color: #22c55e; margin-bottom: 16px; }
+.quote-success h2 { font-size: 22px; margin: 0 0 8px; color: var(--portal-gray-900); }
+.quote-success p { color: var(--portal-gray-500); font-size: 15px; margin: 0 0 24px; }
+.quote-success .req-number { font-size: 18px; font-weight: 700; color: var(--portal-primary); }
+</style>
+
+{% include "corrugated_portal/templates/includes/portal_navbar.html" %}
+
+<div class="portal-container">
+    <h1 class="portal-page-title">Request a Quote</h1>
+    <p class="portal-page-subtitle">Fill out the form below and our team will get back to you with a quote.</p>
+
+    <form class="quote-form" id="quote-form" onsubmit="submitQuote(event)">
+        <div class="form-section">
+            <div class="form-section-title">Contact Information</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Your Name</label>
+                    <input type="text" class="form-input" id="qf-contact-name" placeholder="John Smith">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="qf-contact-email" placeholder="john@company.com">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-section-title">Box Specification</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Box Style <span class="required">*</span></label>
+                    <select class="form-select" id="qf-box-style" required>
+                        <option value="">Select style...</option>
+                        <option value="RSC">RSC (Regular Slotted Container)</option>
+                        <option value="FOL">FOL (Full Overlap)</option>
+                        <option value="HSC">HSC (Half Slotted Container)</option>
+                        <option value="TRAY">TRAY</option>
+                        <option value="BLISS">BLISS</option>
+                        <option value="DIE-CUT">DIE-CUT</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Quantity Needed <span class="required">*</span></label>
+                    <input type="number" class="form-input" id="qf-quantity" min="1" placeholder="1000" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Length</label>
+                    <div class="dim-group">
+                        <input type="number" class="form-input" id="qf-length" step="0.0625" min="0" placeholder="12">
+                        <span class="dim-unit">in</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Width</label>
+                    <div class="dim-group">
+                        <input type="number" class="form-input" id="qf-width" step="0.0625" min="0" placeholder="10">
+                        <span class="dim-unit">in</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Depth</label>
+                    <div class="dim-group">
+                        <input type="number" class="form-input" id="qf-depth" step="0.0625" min="0" placeholder="8">
+                        <span class="dim-unit">in</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Wall Type</label>
+                    <select class="form-select" id="qf-wall-type">
+                        <option value="Single Wall">Single Wall</option>
+                        <option value="Double Wall">Double Wall</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Flute</label>
+                    <select class="form-select" id="qf-flute">
+                        <option value="C">C Flute</option>
+                        <option value="B">B Flute</option>
+                        <option value="E">E Flute</option>
+                        <option value="BC">BC (Double Wall)</option>
+                        <option value="EB">EB (Double Wall)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-section-title">Print & Finish</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Number of Print Colors</label>
+                    <select class="form-select" id="qf-colors">
+                        <option value="0">No Print</option>
+                        <option value="1">1 Color</option>
+                        <option value="2">2 Colors</option>
+                        <option value="3">3 Colors</option>
+                        <option value="4">4+ Colors</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Coating</label>
+                    <select class="form-select" id="qf-coating">
+                        <option value="None">None</option>
+                        <option value="Aqueous">Aqueous</option>
+                        <option value="UV">UV</option>
+                        <option value="Matte">Matte</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-section-title">Additional Details</div>
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label class="form-label">Special Requirements</label>
+                    <textarea class="form-textarea" id="qf-special" placeholder="Describe any special needs: custom die cuts, inserts, moisture resistance, etc."></textarea>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label class="form-label">Urgency</label>
+                    <div class="urgency-options">
+                        <div class="urgency-option">
+                            <input type="radio" name="urgency" id="urg-standard" value="Standard" checked>
+                            <label for="urg-standard">Standard</label>
+                        </div>
+                        <div class="urgency-option">
+                            <input type="radio" name="urgency" id="urg-rush" value="Rush">
+                            <label for="urg-rush">Rush</label>
+                        </div>
+                        <div class="urgency-option">
+                            <input type="radio" name="urgency" id="urg-emergency" value="Emergency">
+                            <label for="urg-emergency">Emergency</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="portal-btn portal-btn-primary" id="submit-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Submit Quote Request
+            </button>
+        </div>
+    </form>
+
+    <div class="quote-success" id="quote-success">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <h2>Quote Request Submitted!</h2>
+        <p>Our team will review your request and get back to you shortly.</p>
+        <div class="req-number" id="success-req-num"></div>
+        <br>
+        <a href="/portal" class="portal-btn portal-btn-primary">Back to Dashboard</a>
+    </div>
+</div>
+
+<script>
+function submitQuote(e) {
+    e.preventDefault();
+
+    var btn = document.getElementById("submit-btn");
+    btn.disabled = true;
+    btn.textContent = "Submitting...";
+
+    var urgency = document.querySelector('input[name="urgency"]:checked');
+
+    frappe.call({
+        method: "corrugated_portal.api.submit_quote_request",
+        args: {
+            box_style: document.getElementById("qf-box-style").value,
+            length: document.getElementById("qf-length").value || 0,
+            width: document.getElementById("qf-width").value || 0,
+            depth: document.getElementById("qf-depth").value || 0,
+            quantity_needed: document.getElementById("qf-quantity").value || 0,
+            num_colors: document.getElementById("qf-colors").value || 0,
+            wall_type: document.getElementById("qf-wall-type").value,
+            flute: document.getElementById("qf-flute").value,
+            coating: document.getElementById("qf-coating").value,
+            special_requirements: document.getElementById("qf-special").value,
+            contact_name: document.getElementById("qf-contact-name").value,
+            contact_email: document.getElementById("qf-contact-email").value,
+            urgency: urgency ? urgency.value : "Standard",
+        },
+        callback: function (r) {
+            if (r.message && r.message.status === "success") {
+                document.getElementById("quote-form").style.display = "none";
+                document.getElementById("quote-success").style.display = "block";
+                document.getElementById("success-req-num").textContent = r.message.request;
+            } else {
+                frappe.msgprint("Error submitting quote request. Please try again.");
+                btn.disabled = false;
+                btn.textContent = "Submit Quote Request";
+            }
+        },
+        error: function () {
+            frappe.msgprint("Error submitting quote request. Please try again.");
+            btn.disabled = false;
+            btn.textContent = "Submit Quote Request";
+        }
+    });
+}
+</script>
+{% endblock %}

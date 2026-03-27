@@ -1,0 +1,223 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Account - Customer Portal{% endblock %}
+
+{% block page_content %}
+<style>
+:root {
+    --portal-primary: #1a6bb0;
+    --portal-primary-dark: #145a94;
+    --portal-primary-light: #e8f1fa;
+    --portal-gray-50: #f9fafb;
+    --portal-gray-100: #f3f4f6;
+    --portal-gray-200: #e5e7eb;
+    --portal-gray-300: #d1d5db;
+    --portal-gray-500: #6b7280;
+    --portal-gray-700: #374151;
+    --portal-gray-900: #111827;
+    --portal-radius: 12px;
+    --portal-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    --portal-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+.portal-navbar{background:var(--portal-primary);color:#fff;padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}.portal-navbar-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}.portal-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-size:18px;font-weight:700}.portal-brand:hover{color:#fff;text-decoration:none}.portal-nav-links{display:flex;align-items:center;gap:4px}.portal-nav-link{display:flex;align-items:center;gap:6px;padding:8px 14px;color:rgba(255,255,255,.85);text-decoration:none;border-radius:8px;font-size:14px;font-weight:500;transition:all .15s ease}.portal-nav-link:hover{background:rgba(255,255,255,.15);color:#fff;text-decoration:none}.portal-nav-link.active{background:rgba(255,255,255,.2);color:#fff}.portal-logout{margin-left:8px}.portal-menu-toggle{display:none;background:0 0;border:none;color:#fff;cursor:pointer;padding:6px}@media(max-width:900px){.portal-menu-toggle{display:block}.portal-nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--portal-primary);flex-direction:column;padding:12px 16px;gap:4px;box-shadow:0 8px 16px rgba(0,0,0,.2)}.portal-nav-links.open{display:flex}.portal-nav-link{width:100%;padding:12px 16px}}
+.portal-badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.portal-badge-green{background:#dcfce7;color:#16a34a}.portal-badge-blue{background:#dbeafe;color:#2563eb}.portal-badge-yellow{background:#fef9c3;color:#ca8a04}.portal-badge-red{background:#fee2e2;color:#dc2626}.portal-badge-gray{background:var(--portal-gray-100);color:var(--portal-gray-500)}
+
+.portal-container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+.portal-page-title { font-size: 24px; font-weight: 700; color: var(--portal-gray-900); margin: 0 0 24px; }
+.portal-empty { text-align: center; padding: 48px 24px; color: var(--portal-gray-500); }
+
+/* Balance banner */
+.balance-banner {
+    background: linear-gradient(135deg, var(--portal-primary) 0%, var(--portal-primary-dark) 100%);
+    border-radius: var(--portal-radius);
+    padding: 32px 40px;
+    color: #fff;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.balance-label { font-size: 14px; opacity: 0.85; margin-bottom: 4px; }
+.balance-amount { font-size: 36px; font-weight: 700; line-height: 1; }
+.balance-invoices { font-size: 14px; opacity: 0.85; margin-top: 4px; }
+
+/* Section */
+.account-section {
+    margin-bottom: 40px;
+}
+.account-section h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--portal-gray-900);
+    margin: 0 0 16px;
+}
+
+/* Tables */
+.account-table-wrap {
+    background: #fff;
+    border-radius: var(--portal-radius);
+    box-shadow: var(--portal-shadow);
+    overflow: hidden;
+}
+.account-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.account-table th {
+    background: var(--portal-gray-50);
+    padding: 14px 20px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--portal-gray-500);
+    border-bottom: 2px solid var(--portal-gray-200);
+}
+.account-table td {
+    padding: 14px 20px;
+    font-size: 14px;
+    color: var(--portal-gray-700);
+    border-bottom: 1px solid var(--portal-gray-100);
+}
+.account-table tr:last-child td { border-bottom: none; }
+.inv-link { color: var(--portal-primary); font-weight: 600; text-decoration: none; }
+.inv-link:hover { text-decoration: underline; }
+.amount-col { font-weight: 600; text-align: right; }
+.overdue-row { background: #fff5f5; }
+.overdue-row td { color: #b91c1c; }
+
+@media (max-width: 640px) {
+    .balance-banner { padding: 24px; }
+    .balance-amount { font-size: 28px; }
+    .account-table th:nth-child(3), .account-table td:nth-child(3) { display: none; }
+}
+</style>
+
+{% include "corrugated_portal/templates/includes/portal_navbar.html" %}
+
+<div class="portal-container">
+    <h1 class="portal-page-title">Account Summary</h1>
+
+    <!-- Balance Banner -->
+    <div class="balance-banner" id="balance-banner" style="display:none;">
+        <div>
+            <div class="balance-label">Total Outstanding Balance</div>
+            <div class="balance-amount" id="total-balance">$0.00</div>
+            <div class="balance-invoices" id="invoice-count">0 outstanding invoices</div>
+        </div>
+    </div>
+
+    <!-- Outstanding Invoices -->
+    <div class="account-section">
+        <h2>Outstanding Invoices</h2>
+        <div class="account-table-wrap">
+            <table class="account-table">
+                <thead>
+                    <tr>
+                        <th>Invoice #</th>
+                        <th>Date</th>
+                        <th>Due Date</th>
+                        <th style="text-align:right;">Total</th>
+                        <th style="text-align:right;">Outstanding</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="invoices-tbody">
+                    <tr><td colspan="6" class="portal-empty">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Payment History -->
+    <div class="account-section">
+        <h2>Recent Payments</h2>
+        <div class="account-table-wrap">
+            <table class="account-table">
+                <thead>
+                    <tr>
+                        <th>Payment #</th>
+                        <th>Date</th>
+                        <th>Reference</th>
+                        <th style="text-align:right;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="payments-tbody">
+                    <tr><td colspan="4" class="portal-empty">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    frappe.call({
+        method: "corrugated_portal.api.get_account_summary",
+        callback: function (r) {
+            var d = r.message;
+            if (!d || !d.customer) {
+                document.getElementById("invoices-tbody").innerHTML =
+                    '<tr><td colspan="6" class="portal-empty">No account data available.</td></tr>';
+                document.getElementById("payments-tbody").innerHTML =
+                    '<tr><td colspan="4" class="portal-empty">No payment data available.</td></tr>';
+                return;
+            }
+
+            // Balance banner
+            document.getElementById("balance-banner").style.display = "flex";
+            document.getElementById("total-balance").textContent =
+                "$" + (d.total_outstanding || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
+            var invCount = d.outstanding_invoices ? d.outstanding_invoices.length : 0;
+            document.getElementById("invoice-count").textContent =
+                invCount + " outstanding invoice" + (invCount !== 1 ? "s" : "");
+
+            // Invoices
+            var invoices = d.outstanding_invoices || [];
+            if (invoices.length) {
+                var html = "";
+                var today = new Date().toISOString().split("T")[0];
+                invoices.forEach(function (inv) {
+                    var isOverdue = inv.due_date < today;
+                    html += '<tr class="' + (isOverdue ? "overdue-row" : "") + '">' +
+                        '<td><span class="inv-link">' + inv.name + '</span></td>' +
+                        '<td>' + inv.posting_date + '</td>' +
+                        '<td>' + inv.due_date + '</td>' +
+                        '<td class="amount-col">$' + (inv.grand_total || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) + '</td>' +
+                        '<td class="amount-col">$' + (inv.outstanding_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) + '</td>' +
+                        '<td><span class="portal-badge ' + (isOverdue ? "portal-badge-red" : "portal-badge-yellow") + '">' +
+                        (isOverdue ? "Overdue" : "Pending") + '</span></td>' +
+                        '</tr>';
+                });
+                document.getElementById("invoices-tbody").innerHTML = html;
+            } else {
+                document.getElementById("invoices-tbody").innerHTML =
+                    '<tr><td colspan="6" class="portal-empty">No outstanding invoices. You\'re all caught up!</td></tr>';
+            }
+
+            // Payments
+            var payments = d.recent_payments || [];
+            if (payments.length) {
+                var phtml = "";
+                payments.forEach(function (p) {
+                    phtml += '<tr>' +
+                        '<td><strong>' + p.name + '</strong></td>' +
+                        '<td>' + p.posting_date + '</td>' +
+                        '<td>' + (p.reference_no || "-") + '</td>' +
+                        '<td class="amount-col" style="color:#16a34a;">$' +
+                        (p.paid_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) + '</td>' +
+                        '</tr>';
+                });
+                document.getElementById("payments-tbody").innerHTML = phtml;
+            } else {
+                document.getElementById("payments-tbody").innerHTML =
+                    '<tr><td colspan="4" class="portal-empty">No recent payments found.</td></tr>';
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

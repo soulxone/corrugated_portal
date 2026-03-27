@@ -1,0 +1,288 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Track Shipments - Customer Portal{% endblock %}
+
+{% block page_content %}
+<style>
+:root {
+    --portal-primary: #1a6bb0;
+    --portal-primary-dark: #145a94;
+    --portal-primary-light: #e8f1fa;
+    --portal-gray-50: #f9fafb;
+    --portal-gray-100: #f3f4f6;
+    --portal-gray-200: #e5e7eb;
+    --portal-gray-300: #d1d5db;
+    --portal-gray-500: #6b7280;
+    --portal-gray-700: #374151;
+    --portal-gray-900: #111827;
+    --portal-radius: 12px;
+    --portal-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    --portal-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+.portal-navbar{background:var(--portal-primary);color:#fff;padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15)}.portal-navbar-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}.portal-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-size:18px;font-weight:700}.portal-brand:hover{color:#fff;text-decoration:none}.portal-nav-links{display:flex;align-items:center;gap:4px}.portal-nav-link{display:flex;align-items:center;gap:6px;padding:8px 14px;color:rgba(255,255,255,.85);text-decoration:none;border-radius:8px;font-size:14px;font-weight:500;transition:all .15s ease}.portal-nav-link:hover{background:rgba(255,255,255,.15);color:#fff;text-decoration:none}.portal-nav-link.active{background:rgba(255,255,255,.2);color:#fff}.portal-logout{margin-left:8px}.portal-menu-toggle{display:none;background:0 0;border:none;color:#fff;cursor:pointer;padding:6px}@media(max-width:900px){.portal-menu-toggle{display:block}.portal-nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--portal-primary);flex-direction:column;padding:12px 16px;gap:4px;box-shadow:0 8px 16px rgba(0,0,0,.2)}.portal-nav-links.open{display:flex}.portal-nav-link{width:100%;padding:12px 16px}}
+.portal-badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.portal-badge-green{background:#dcfce7;color:#16a34a}.portal-badge-blue{background:#dbeafe;color:#2563eb}.portal-badge-yellow{background:#fef9c3;color:#ca8a04}.portal-badge-red{background:#fee2e2;color:#dc2626}.portal-badge-gray{background:var(--portal-gray-100);color:var(--portal-gray-500)}
+
+.portal-container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+.portal-page-title { font-size: 24px; font-weight: 700; color: var(--portal-gray-900); margin: 0 0 24px; }
+.portal-empty { text-align: center; padding: 48px 24px; color: var(--portal-gray-500); }
+
+/* Shipment cards */
+.shipment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 20px;
+}
+.shipment-card {
+    background: #fff;
+    border-radius: var(--portal-radius);
+    padding: 24px;
+    box-shadow: var(--portal-shadow);
+}
+.shipment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.shipment-name { font-size: 18px; font-weight: 700; color: var(--portal-gray-900); }
+.shipment-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+.shipment-meta-label { color: var(--portal-gray-500); font-size: 12px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; }
+.shipment-meta-value { color: var(--portal-gray-900); font-weight: 500; margin-top: 2px; }
+
+/* Timeline */
+.shipment-timeline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    position: relative;
+}
+.shipment-timeline::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 28px;
+    right: 28px;
+    height: 3px;
+    background: var(--portal-gray-200);
+    transform: translateY(-50%);
+    z-index: 0;
+}
+.timeline-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+    position: relative;
+}
+.timeline-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--portal-gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+}
+.timeline-dot.complete {
+    background: #22c55e;
+    color: #fff;
+}
+.timeline-dot.active {
+    background: var(--portal-primary);
+    color: #fff;
+    box-shadow: 0 0 0 4px var(--portal-primary-light);
+}
+.timeline-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--portal-gray-500);
+    text-transform: uppercase;
+}
+
+/* Map */
+.shipment-map {
+    width: 100%;
+    height: 200px;
+    border-radius: 8px;
+    background: var(--portal-gray-100);
+    margin-top: 16px;
+    overflow: hidden;
+}
+
+/* Delivery Notes section */
+.dn-section { margin-bottom: 40px; }
+.dn-section h2 { font-size: 20px; font-weight: 700; color: var(--portal-gray-900); margin: 0 0 16px; }
+.dn-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: var(--portal-radius);
+    box-shadow: var(--portal-shadow);
+    overflow: hidden;
+}
+.dn-table th {
+    background: var(--portal-gray-50);
+    padding: 14px 20px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--portal-gray-500);
+    border-bottom: 2px solid var(--portal-gray-200);
+}
+.dn-table td {
+    padding: 14px 20px;
+    font-size: 14px;
+    color: var(--portal-gray-700);
+    border-bottom: 1px solid var(--portal-gray-100);
+}
+</style>
+
+{% include "corrugated_portal/templates/includes/portal_navbar.html" %}
+
+<div class="portal-container">
+    <h1 class="portal-page-title">Track Shipments</h1>
+
+    <div id="tracking-content">
+        <div class="portal-empty">Loading shipment data...</div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    frappe.call({
+        method: "corrugated_portal.api.get_tracking_info",
+        callback: function (r) {
+            var data = r.message || {};
+            var deliveries = data.deliveries || [];
+            var loads = data.loads || [];
+            var container = document.getElementById("tracking-content");
+
+            if (!deliveries.length && !loads.length) {
+                container.innerHTML = '<div class="portal-empty">' +
+                    '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.4;margin-bottom:16px"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>' +
+                    '<p>No active shipments found.</p></div>';
+                return;
+            }
+
+            var html = "";
+
+            // Load Tags (with GPS)
+            if (loads.length) {
+                html += '<div class="shipment-grid">';
+                loads.forEach(function (load, idx) {
+                    var isDelivered = load.status === "Delivered";
+                    var isTransit = load.status === "In Transit";
+
+                    html += '<div class="shipment-card">' +
+                        '<div class="shipment-header">' +
+                        '<span class="shipment-name">' + load.name + '</span>' +
+                        '<span class="portal-badge ' + (isDelivered ? "portal-badge-green" : "portal-badge-blue") + '">' + load.status + '</span>' +
+                        '</div>' +
+                        '<div class="shipment-meta">' +
+                        '<div><div class="shipment-meta-label">Trailer</div><div class="shipment-meta-value">' + (load.trailer_number || "-") + '</div></div>' +
+                        '<div><div class="shipment-meta-label">Ship Date</div><div class="shipment-meta-value">' + (load.ship_date || "-") + '</div></div>' +
+                        '<div><div class="shipment-meta-label">Pallets</div><div class="shipment-meta-value">' + (load.total_pallets || 0) + '</div></div>' +
+                        '<div><div class="shipment-meta-label">Pieces</div><div class="shipment-meta-value">' + (load.total_pieces || 0) + '</div></div>' +
+                        '</div>';
+
+                    // Timeline
+                    html += '<div class="shipment-timeline">' +
+                        '<div class="timeline-step"><div class="timeline-dot complete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="timeline-label">Packed</span></div>' +
+                        '<div class="timeline-step"><div class="timeline-dot ' + (isTransit ? "active" : isDelivered ? "complete" : "") + '">' +
+                        (isTransit ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="1" y="3" width="15" height="13"/></svg>' :
+                         isDelivered ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '') +
+                        '</div><span class="timeline-label">In Transit</span></div>' +
+                        '<div class="timeline-step"><div class="timeline-dot ' + (isDelivered ? "complete" : "") + '">' +
+                        (isDelivered ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '') +
+                        '</div><span class="timeline-label">Delivered</span></div>' +
+                        '</div>';
+
+                    // GPS Map
+                    if (load.last_gps_lat && load.last_gps_lng) {
+                        html += '<div class="shipment-map" id="map-' + idx + '" data-lat="' + load.last_gps_lat + '" data-lng="' + load.last_gps_lng + '"></div>' +
+                            '<div style="font-size:12px;color:var(--portal-gray-500);margin-top:6px;">Last updated: ' + (load.last_gps_time || "N/A") + '</div>';
+                    }
+
+                    if (load.expected_delivery_date) {
+                        html += '<div style="margin-top:12px;padding:12px 16px;background:var(--portal-primary-light);border-radius:8px;font-size:14px;">' +
+                            '<strong>Expected Delivery:</strong> ' + load.expected_delivery_date + '</div>';
+                    }
+
+                    html += '</div>';
+                });
+                html += '</div>';
+            }
+
+            // Delivery Notes
+            if (deliveries.length) {
+                html += '<div class="dn-section" style="margin-top:32px;">' +
+                    '<h2>Delivery Notes</h2>' +
+                    '<table class="dn-table"><thead><tr>' +
+                    '<th>Delivery #</th><th>Date</th><th>Status</th><th>Transporter</th><th>LR No</th>' +
+                    '</tr></thead><tbody>';
+                deliveries.forEach(function (dn) {
+                    var badge = dn.status === "Completed" ? "portal-badge-green" : "portal-badge-blue";
+                    html += '<tr><td><strong>' + dn.name + '</strong></td>' +
+                        '<td>' + dn.posting_date + '</td>' +
+                        '<td><span class="portal-badge ' + badge + '">' + dn.status + '</span></td>' +
+                        '<td>' + (dn.transporter_name || "-") + '</td>' +
+                        '<td>' + (dn.lr_no || "-") + '</td></tr>';
+                });
+                html += '</tbody></table></div>';
+            }
+
+            container.innerHTML = html;
+
+            // Initialize maps
+            initMaps();
+        }
+    });
+});
+
+function initMaps() {
+    var mapDivs = document.querySelectorAll(".shipment-map[data-lat]");
+    if (!mapDivs.length) return;
+
+    // Load Google Maps
+    if (typeof google !== "undefined" && google.maps) {
+        renderMaps(mapDivs);
+    } else {
+        var script = document.createElement("script");
+        script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBWdj5eIHgWmFa0SP4d-Agb8KmESh0uDJs&callback=onMapsReady";
+        script.async = true;
+        window.onMapsReady = function () { renderMaps(mapDivs); };
+        document.head.appendChild(script);
+    }
+}
+
+function renderMaps(mapDivs) {
+    mapDivs.forEach(function (el) {
+        var lat = parseFloat(el.dataset.lat);
+        var lng = parseFloat(el.dataset.lng);
+        if (isNaN(lat) || isNaN(lng)) return;
+
+        var map = new google.maps.Map(el, {
+            center: { lat: lat, lng: lng },
+            zoom: 10,
+            disableDefaultUI: true,
+            zoomControl: true,
+        });
+        new google.maps.Marker({
+            position: { lat: lat, lng: lng },
+            map: map,
+            title: "Current Location",
+        });
+    });
+}
+</script>
+{% endblock %}
