@@ -43,7 +43,7 @@ class QuoteRequest(Document):
     def _notify_sales(self):
         """Send email notification to sales about new quote request."""
         try:
-            settings = frappe.get_single("Portal Settings")
+            settings = frappe.get_single("Corrugated Portal Settings")
             recipients = settings.contact_email or frappe.db.get_single_value(
                 "Website Settings", "email"
             )
