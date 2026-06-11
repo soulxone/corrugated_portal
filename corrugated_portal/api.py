@@ -19,8 +19,10 @@ def _get_customer_for_user():
         )
         if links:
             return links[0].link_name
-    # Fallback: check Customer directly
-    customer = frappe.db.get_value("Customer", {"portal_user": user}, "name")
+    # Fallback: Customer.portal_users child table (Portal User rows)
+    customer = frappe.db.get_value(
+        "Portal User", {"parenttype": "Customer", "user": user}, "parent"
+    )
     return customer
 
 
@@ -112,11 +114,22 @@ def get_order_detail(order_name):
             }
         )
 
-    # Get shipment info
-    shipments = frappe.get_all(
-        "Delivery Note",
+    # Get shipment info — against_sales_order lives on Delivery Note Item,
+    # so collect parents through the child table
+    dn_names = frappe.get_all(
+        "Delivery Note Item",
         filters={"against_sales_order": order_name, "docstatus": 1},
-        fields=["name", "posting_date", "status"],
+        pluck="parent",
+        distinct=True,
+    )
+    shipments = (
+        frappe.get_all(
+            "Delivery Note",
+            filters={"name": ["in", dn_names]},
+            fields=["name", "posting_date", "status"],
+        )
+        if dn_names
+        else []
     )
 
     return {

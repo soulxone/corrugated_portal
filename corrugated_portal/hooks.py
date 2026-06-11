@@ -3,7 +3,8 @@ app_title = "Corrugated Portal"
 app_publisher = "Welchwyse"
 app_description = "Customer self-service portal for corrugated packaging orders"
 app_version = "0.1.0"
-required_apps = ["frappe", "erpnext"]
+# corrugated_estimating: two portal doctypes Link to "Corrugated Estimate"
+required_apps = ["frappe", "erpnext", "corrugated_estimating"]
 
 website_route_rules = [
     {"from_route": "/portal", "to_route": "portal_home"},
